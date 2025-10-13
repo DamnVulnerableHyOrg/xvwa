@@ -10,6 +10,9 @@ on:
 jobs:
 
   semgrep-full:
+      permissions:
+        contents: read
+        security-events: write
       runs-on: ubuntu-latest
       container:
         image: returntocorp/semgrep
