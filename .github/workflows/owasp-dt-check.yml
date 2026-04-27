@@ -1,0 +1,30 @@
+name: OWASP Dependency Track Check
+
+on: [push]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-xml
+          output-file: bom.xml
+
+      - name: Upload SBOM to Dependency-Track
+        uses: DependencyTrack/gh-upload-sbom@v3.1.0
+        with:
+          serverHostname: ${{ secrets.OWASP_DT_HOSTNAME }}
+          apiKey: ${{ secrets.OWASP_DT_KEY }}
+          projectName: ${{ github.event.repository.name }}
+          projectVersion: ${{ github.ref_name }}
+          bomFilename: bom.xml
+          autoCreate: true
